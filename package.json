@@ -1,7 +1,7 @@
 {
   "name": "resumegeneration-backend",
   "version": "1.0.0",
-  "description": "StoryTeller Node.js with Rest API",
+  "description": "ResumeGeneration Node.js with Rest API",
   "main": "server.js",
   "scripts": {
     "test": "jest --",

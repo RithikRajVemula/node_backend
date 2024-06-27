@@ -1,5 +1,5 @@
 [Unit]
-Description=NodeJS StoryTeller Backend
+Description=NodeJS ResumeGeneration Backend
 After=network.target
  
 [Service]

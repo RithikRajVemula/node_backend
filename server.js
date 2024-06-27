@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to the StoryTeller backend." });
+  res.json({ message: "Welcome to the ResumeGeneration backend." });
 });
 
 require("./app/routes/auth.routes.js")(app);
