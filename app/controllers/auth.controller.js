@@ -20,17 +20,23 @@ exports.login = async (req, res) => {
     const session = {
       email: user.email,
       userId: userId,
-      expirationDate: expireTime,
+      expiration_date: expireTime,
     };
     await Session.create(session).then(async (data) => {
       let sessionId = data.id;
       let token = await encrypt(sessionId);
       let userInfo = {
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        first_name: user.first_name,
+        last_name: user.last_name,
         id: user.id,
+        is_admin: user.is_admin,
         token: token,
+        phone_number: user.phone_number,
+        address: user.address,
+        linkedin_url: user.linkedin_url,
+        portfolio: user.portfolio,
+        professional_summary: user.professional_summary,
       };
       res.send(userInfo);
     });
