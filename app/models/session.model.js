@@ -4,7 +4,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    expirationDate: {
+    expiration_date: {
       type: Sequelize.DATE,
       allowNull: false,
     },
