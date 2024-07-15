@@ -21,10 +21,6 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: true,
     },
-    location: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
     from_date: {
       type: Sequelize.DATE,
       allowNull: false,

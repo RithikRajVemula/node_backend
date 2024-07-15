@@ -21,10 +21,6 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
       allowNull: false,
     },
-    location: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
     information: {
       type: Sequelize.TEXT,
       allowNull: true,
