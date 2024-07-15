@@ -46,7 +46,9 @@ const createOrUpdateEntities = async (resumeId, entityData, entityModel, transac
   await entityModel.destroy({ where: { resumeId: resumeId }, transaction });
   await Promise.all(entityData.map(data => {
     data.resumeId = resumeId;
-    return entityModel.create(data, { transaction });
+    const { id, ...dataWithoutId } = data;
+    dataWithoutId.resumeId = resumeId;
+    return entityModel.create(dataWithoutId, { transaction });
   }));
 };
 
