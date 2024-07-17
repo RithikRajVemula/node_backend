@@ -19,6 +19,10 @@ exports.create = async (req, res) => {
     const error = new Error("email cannot be empty for user!");
     error.statusCode = 400;
     throw error;
+  } else if (!req.body.email.endsWith('@eagles.oc.edu')) {
+    const error = new Error("email must have eagles.oc.edu domain!");
+    error.statusCode = 400;
+    throw error;
   } else if (req.body.password === undefined) {
     const error = new Error("password cannot be empty for user!");
     error.statusCode = 400;

@@ -4,7 +4,7 @@ module.exports = (app) => {
   const { authenticateRoute,adminAuthenticateRoute } = require("../authentication/authentication");
 
   // Create a new User
-  router.post("/users/", [authenticateRoute], User.create);
+  router.post("/users/", User.create);
 
   // Retrieve all Users
   router.get("/users/", [adminAuthenticateRoute], User.findAll);
