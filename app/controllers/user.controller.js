@@ -6,6 +6,7 @@ const { encrypt, getSalt, hashPassword } = require("../authentication/crypto");
 
 // Create and Save a new User
 exports.create = async (req, res) => {
+  try {
   // Validate request
   if (req.body.first_name === undefined) {
     const error = new Error("first_name cannot be empty for user!");
@@ -110,6 +111,12 @@ exports.create = async (req, res) => {
     .catch((err) => {
       return err.message || "Error retrieving User with email=" + email;
     });
+  }
+  catch(err) {
+    res.status(404).send({
+      message: err.message || "Some error occurred while creating profile!",
+    });
+  }
 };
 
 // Retrieve all Users from the database.
