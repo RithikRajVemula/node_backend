@@ -1,5 +1,5 @@
 const db = require("../models");
-const { hashPassword } = require("./crypto");
+const { hashPassword, decrypt } = require("./crypto");
 const Session = db.session;
 const User = db.user;
 
@@ -56,7 +56,7 @@ authenticate = async (req, res, require = true) => {
           console.log(error);
         });
       if (session != null) {
-        if (session.expirationDate >= Date.now()) {
+        if (session.expiration_date >= Date.now()) {
           return {
             type: "token",
             userId: session.userId,
@@ -83,43 +83,122 @@ authenticate = async (req, res, require = true) => {
 };
 
 authenticateRoute = async (req, res, next) => {
-  let auth = req.get("authorization");
-  console.log(auth);
-  if (auth != null) {
-    if (
-      auth.startsWith("Bearer ") &&
-      (typeof require !== "string" || require === "token")
-    ) {
-      let token = auth.slice(7);
-      let sessionId = await decrypt(token);
-      let session = {};
-      await Session.findAll({ where: { id: sessionId } })
-        .then((data) => {
-          session = data[0];
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      if (session != null) {
-        console.log(session >= Date.now());
-        console.log(Date.now());
-        if (session.expirationDate >= Date.now()) {
-          next();
-          return;
+  try {
+    let auth = req.get("authorization");
+    console.log(auth);
+    if (auth != null) {
+      if (
+        auth.startsWith("Bearer ") &&
+        (typeof require !== "string" || require === "token")
+      ) {
+        let token = auth.slice(7);
+        let sessionId = await decrypt(token);
+        let session = {};
+        await Session.findAll({ where: { id: sessionId } })
+          .then((data) => {
+            session = data[0];
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        if (session != null) {
+          console.log("sess", session.expiration_date);
+          console.log(session.expiration_date >= Date.now());
+          console.log(Date.now());
+          if (session.expiration_date >= Date.now()) {
+            next();
+            return;
+          } else {
+            return res.status(401).send({
+              message: "Unauthorized! Expired Token, Logout and Login again",
+            });
+          }
         } else {
           return res.status(401).send({
             message: "Unauthorized! Expired Token, Logout and Login again",
           });
         }
-      } else {
-        return res.status(401).send({
-          message: "Unauthorized! Expired Token, Logout and Login again",
-        });
       }
+    } else {
+      return res.status(401).send({
+        message: "Unauthorized! No Auth Header",
+      });
     }
-  } else {
+  } catch (error) {
+    console.log("error", error);
     return res.status(401).send({
-      message: "Unauthorized! No Auth Header",
+      message:
+        error.message?.message ||
+        error.message ||
+        "Error occured while verifying user!",
+    });
+  }
+};
+
+adminAuthenticateRoute = async (req, res, next) => {
+  try {
+    let auth = req.get("authorization");
+    console.log(auth);
+    if (auth != null) {
+      if (
+        auth.startsWith("Bearer ") &&
+        (typeof require !== "string" || require === "token")
+      ) {
+        let token = auth.slice(7);
+        let sessionId = await decrypt(token);
+        let session = {};
+        await Session.findAll({ where: { id: sessionId } })
+          .then((data) => {
+            session = data[0];
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+        if (session != null) {
+          console.log("sess", session.expiration_date);
+          console.log(session.expiration_date >= Date.now());
+          console.log(Date.now());
+          if (session.expiration_date >= Date.now()) {
+            let user = {};
+            await User.findAll({ where: { id: session.userId } })
+              .then((data) => {
+                user = data[0];
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+
+            if (user != null && user.is_admin) {
+              next();
+              return;
+            } else {
+              return res.status(403).send({
+                message: "Forbidden! Admin access required",
+              });
+            }
+          } else {
+            return res.status(401).send({
+              message: "Unauthorized! Expired Token, Logout and Login again",
+            });
+          }
+        } else {
+          return res.status(401).send({
+            message: "Unauthorized! Expired Token, Logout and Login again",
+          });
+        }
+      }
+    } else {
+      return res.status(401).send({
+        message: "Unauthorized! No Auth Header",
+      });
+    }
+  } catch (error) {
+    console.log("error", error);
+    return res.status(401).send({
+      message:
+        error.message?.message ||
+        error.message ||
+        "Error occured while verifying user!",
     });
   }
 };
@@ -127,6 +206,7 @@ authenticateRoute = async (req, res, next) => {
 const auth = {
   authenticate: authenticate,
   authenticateRoute: authenticateRoute,
+  adminAuthenticateRoute: adminAuthenticateRoute
 };
 
 module.exports = auth;
