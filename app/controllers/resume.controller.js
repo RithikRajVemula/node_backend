@@ -68,7 +68,7 @@ exports.create = async (req, res) => {
       portfolio: userDetails.portfolio,
       professional_summary: userDetails.professional_summary,
       mobile: userDetails.mobile,
-      generated_resume_url: "filePath"
+      generated_resume_url: "resumes.pdf"
     }, { transaction});
 
     console.log("req body", req.body);
