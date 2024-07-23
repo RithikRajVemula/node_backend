@@ -20,7 +20,7 @@ module.exports = (app) => {
   router.put("/resumes/:id", [authenticateRoute], resume.update);
 
   // Delete a Resume with id
-  router.delete("/resumes/:id", [adminAuthenticateRoute], resume.delete);
+  router.delete("/resumes/:id", [authenticateRoute], resume.delete);
 
   // Delete all Resumes
   router.delete("/resumes/", [adminAuthenticateRoute], resume.deleteAll);
