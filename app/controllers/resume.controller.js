@@ -10,7 +10,7 @@ const Project = db.project;
 const User = db.user;
 const ResumeComment = db.resumeComment;
 const { sequelize } = db;
-// const { generateResumeUsingLLM  } = require("../utils/utils")
+const { generateResumeUsingLLM  } = require("../utils/utils")
 
 
 const createOrUpdateSkills = async (resumeSkills, transaction) => {
@@ -55,7 +55,7 @@ const createOrUpdateEntities = async (resumeId, entityData, entityModel, transac
 exports.create = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
-    // const { filePath } = await generateResumeUsingLLM(req.body);
+    const { filePath } = await generateResumeUsingLLM(req.body);
     const { userDetails,userId, resumeSkills, experiences, education, extraCurricular, honorAwards, projects } = req.body;
 
     const resume = await Resume.create({ userId,
@@ -68,7 +68,7 @@ exports.create = async (req, res) => {
       portfolio: userDetails.portfolio,
       professional_summary: userDetails.professional_summary,
       mobile: userDetails.mobile,
-      generated_resume_url: "resumes.pdf"
+      generated_resume_url: filePath
     }, { transaction});
 
     console.log("req body", req.body);

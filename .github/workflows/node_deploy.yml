@@ -16,6 +16,8 @@ jobs:
       DB_USER: ${{ secrets.AWS_DB_USER }}
       DB_NAME: ${{ secrets.AWS_DB_NAME }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY}}
+      CHATGPT_ASSISTANT_ID: ${{ secrets.CHATGPT_ASSISTANT_ID}}
 
     steps:
       - uses: actions/checkout@v2
@@ -31,6 +33,8 @@ jobs:
           echo DB_USER = "$DB_USER" >> .env
           echo DB_NAME = "$DB_NAME" >> .env
           echo SECRET_KEY = "$SECRET_KEY" >> .env
+          echo CHATGPT_API_KEY = "$CHATGPT_API_KEY" >> .env
+          echo CHATGPT_ASSISTANT_ID = "$CHATGPT_ASSISTANT_ID" >> .env
 
       - run: npm run bundle
 
