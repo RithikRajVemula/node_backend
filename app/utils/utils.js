@@ -5,48 +5,57 @@ const assistant_id = process.env.CHATGPT_ASSISTANT_ID || "";
 const openAi = new OpenAi({
   apiKey: chatGptApiKey
 })
-
-const fs = require('fs');
 const path = require('path');
-const PDFDocument = require('pdfkit');
+const puppeteer = require('puppeteer'); 
 
-function getRandomInt(min, max) {
+const getRandomInt = (min, max) => {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// Function to generate PDF
-const generatePDF = (content, filePath) => {
-    return new Promise((resolve, reject) => {
-        const doc = new PDFDocument();
-        const stream = fs.createWriteStream(filePath);
-
-        doc.pipe(stream);
-        doc.text(content);
-        doc.end();
-
-        stream.on('finish', () => {
-            resolve(filePath);
-        });
-
-        stream.on('error', (err) => {
-            reject(err);
-        });
-    });
-};
+const generatePDF = async (htmlContent, filePath) => {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(htmlContent);
+    await page.pdf({ path: filePath, format: 'A4' });
+    await browser.close();
+  };
 
 
-exports.generateResumeUsingLLM = async (body) => {
+exports.generateResumeUsingLLM = async (resumeData) => {
+    
+    let prompt = `Generate a professional resume in HTML and CSS format using the following data:
 
-    let prompt = '';
-    if (body) {
-        prompt += JSON.stringify(body);
-    }
+${JSON.stringify(resumeData, null, 2)}
+
+Please adhere to these guidelines:
+1. Use the structure and design of the resume templates provided, adapting them to fit the given data.
+2. Ensure the HTML is semantically correct and the CSS is clean and efficient.
+3. Use font sizes as follows:
+   - 12pt for main section headings (e.g., "Experience", "Education")
+   - 10pt for sub-headings (e.g., job titles, degree names)
+   - 8pt for body text and bullet points
+4. Use a professional, easy-to-read font such as Arial, Helvetica, or Calibri.
+5. Ensure adequate spacing between sections:
+   - Add at least 20px of margin above and below each main section (e.g., between "Experience" and "Education").
+   - Add 10px of margin above and below sub-headings (e.g., between job titles and their descriptions).
+   - Use 5px of margin between bullet points for clarity.
+6. Use black color for all text to maintain a clean and professional look.
+7. Avoid any layout that could cause page breaks inappropriately. Ensure that sections are designed to fit well together without splitting across pages.
+8. Make the design responsive to ensure it looks good when converted to PDF.
+9. Include appropriate margins (e.g., 0.5 to 1 inch) to ensure the resume is printable.
+10. Use bullet points for listing skills, job responsibilities, and achievements.
+11. Highlight key information such as job titles, company names, and dates.
+12. Ensure the overall layout is balanced and visually appealing.
+
+Provide only the HTML and CSS code, starting from the <!DOCTYPE html> declaration and ending with the closing </html> tag. Do not include any explanations or additional text outside of the HTML/CSS code.
+
+The final result should be a polished, professional-looking resume that accurately represents the provided data and is ready for PDF conversion.`;
+    
     console.log("generate pdf prompt", prompt);
-
     try {
-        const assistantId = assistant_id;
+        const assistantId = "asst_9mTJdy9cKNHtHtpaFeyphi0v";
         const thread = await openAi.beta.threads.create();
 
         let run = await openAi.beta.threads.runs.createAndPoll(
@@ -69,7 +78,7 @@ exports.generateResumeUsingLLM = async (body) => {
             console.log(run.status);
         }
         const randomInt = getRandomInt(1, 1000);
-        const resumeContent = responseOfAI.trim();
+        const resumeContent = responseOfAI.trim().replace("```html","").replace("```","");
         console.log("resume content:",resumeContent)
         const pdfFilePath = path.join(__dirname, '../../pdfs', `resume_${randomInt}.pdf`);
 

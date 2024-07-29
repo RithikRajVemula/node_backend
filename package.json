@@ -27,7 +27,7 @@
     "jsonwebtoken": "^9.0.0",
     "mysql2": "^3.2.3",
     "parse": "^4.0.1",
-    "pdfkit": "^0.15.0",
+    "puppeteer": "^22.14.0",
     "sequelize": "^6.19.0",
     "supertest": "^6.3.3"
   }

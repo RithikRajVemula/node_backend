@@ -71,7 +71,7 @@ exports.create = async (req, res) => {
       generated_resume_url: filePath
     }, { transaction});
 
-    console.log("req body", req.body);
+    console.log("create resume: req body: ", req.body);
 
     const skillIds = await createOrUpdateSkills(resumeSkills, transaction);
     await createResumeSkills(resume.id, skillIds, transaction);
@@ -185,6 +185,8 @@ exports.findOne = async (req, res) => {
         await transaction.rollback();
         return res.status(404).send({ message: `Cannot update Resume with id=${id}. Resume was not found!` });
       }
+      const { filePath } = await generateResumeUsingLLM(req.body);
+      console.log("update resume: req body: ", req.body);
       await Resume.update({
         email: userDetails.email,
         first_name: userDetails.first_name,
@@ -194,7 +196,8 @@ exports.findOne = async (req, res) => {
         linkedin_url: userDetails.linkedin_url,
         portfolio: userDetails.portfolio,
         professional_summary: userDetails.professional_summary,
-        mobile: userDetails.mobile
+        mobile: userDetails.mobile,
+        generated_resume_url: filePath
       },{
         where: { id: id },
         transaction
