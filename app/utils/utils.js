@@ -7,6 +7,7 @@ const openAi = new OpenAi({
 })
 const path = require('path');
 const puppeteer = require('puppeteer'); 
+const fs = require('fs').promises;
 
 const getRandomInt = (min, max) => {
     min = Math.ceil(min);
@@ -14,12 +15,31 @@ const getRandomInt = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const generatePDF = async (htmlContent, filePath) => {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.setContent(htmlContent);
-    await page.pdf({ path: filePath, format: 'A4' });
-    await browser.close();
+const generatePDF = async (htmlContent) => {
+    let browser;
+    try {
+      browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        headless: 'new'
+      });
+      const page = await browser.newPage();
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+      
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        // margin: { top: '1cm', right: '1cm', bottom: '1cm', left: '1cm' }
+      });
+  
+      return pdfBuffer;
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      throw error;
+    } finally {
+      if (browser) {
+        await browser.close();
+      }
+    }
   };
 
 
@@ -41,6 +61,7 @@ Please adhere to these guidelines:
    - Add at least 20px of margin above and below each main section (e.g., between "Experience" and "Education").
    - Add 10px of margin above and below sub-headings (e.g., between job titles and their descriptions).
    - Use 5px of margin between bullet points for clarity.
+   - 8pt for bullet points.
 6. Use black color for all text to maintain a clean and professional look.
 7. Avoid any layout that could cause page breaks inappropriately. Ensure that sections are designed to fit well together without splitting across pages.
 8. Make the design responsive to ensure it looks good when converted to PDF.
@@ -83,7 +104,10 @@ The final result should be a polished, professional-looking resume that accurate
         const pdfFilePath = path.join(__dirname, '../../pdfs', `resume_${randomInt}.pdf`);
 
         // // Generate and save PDF
-        await generatePDF(resumeContent, pdfFilePath);
+        const pdfBuffer = await generatePDF(resumeContent);
+
+        // Save the PDF file
+        await fs.writeFile(pdfFilePath, pdfBuffer);
 
         console.log('PDF Generated:', pdfFilePath);
         return { filePath: `resume_${randomInt}.pdf` };
