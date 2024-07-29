@@ -55,7 +55,7 @@ The final result should be a polished, professional-looking resume that accurate
     
     console.log("generate pdf prompt", prompt);
     try {
-        const assistantId = "asst_9mTJdy9cKNHtHtpaFeyphi0v";
+        const assistantId = assistant_id;
         const thread = await openAi.beta.threads.create();
 
         let run = await openAi.beta.threads.runs.createAndPoll(
