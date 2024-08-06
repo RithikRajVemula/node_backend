@@ -45,36 +45,26 @@ const generatePDF = async (htmlContent) => {
 
 exports.generateResumeUsingLLM = async (resumeData) => {
     
-    let prompt = `Generate a professional resume in HTML and CSS format using the following data:
+  let prompt = `Generate a professional resume in HTML and CSS format that exactly matches the layout and design of Template${resumeData.type || 1}.pdf, using the following data:
 
-${JSON.stringify(resumeData, null, 2)}
-
-Please adhere to these guidelines:
-1. Use the structure and design of the resume templates provided, adapting them to fit the given data.
-2. Ensure the HTML is semantically correct and the CSS is clean and efficient.
-3. Use font sizes as follows:
-   - 12pt for main section headings (e.g., "Experience", "Education")
-   - 10pt for sub-headings (e.g., job titles, degree names)
-   - 8pt for body text and bullet points
-4. Use a professional, easy-to-read font such as Arial, Helvetica, or Calibri.
-5. Ensure adequate spacing between sections:
-   - Add at least 20px of margin above and below each main section (e.g., between "Experience" and "Education").
-   - Add 10px of margin above and below sub-headings (e.g., between job titles and their descriptions).
-   - Use 5px of margin between bullet points for clarity.
-   - 8pt for bullet points.
-6. Use black color for all text to maintain a clean and professional look.
-7. Avoid any layout that could cause page breaks inappropriately. Ensure that sections are designed to fit well together without splitting across pages.
-8. Make the design responsive to ensure it looks good when converted to PDF.
-9. Include appropriate margins (e.g., 0.5 to 1 inch) to ensure the resume is printable.
-10. Use bullet points for listing skills, job responsibilities, and achievements.
-11. Highlight key information such as job titles, company names, and dates.
-12. Ensure the overall layout is balanced and visually appealing.
-
-Provide only the HTML and CSS code, starting from the <!DOCTYPE html> declaration and ending with the closing </html> tag. Do not include any explanations or additional text outside of the HTML/CSS code.
-
-The final result should be a polished, professional-looking resume that accurately represents the provided data and is ready for PDF conversion.`;
-    
-    console.log("generate pdf prompt", prompt);
+  ${JSON.stringify(resumeData, null, 2)}
+  
+  Please adhere to these guidelines:
+  1. Replicate the exact structure, layout, and design of Template${resumeData.type || 1}.html, adapting it to fit the given data.
+  2. Use the same fonts, font sizes, colors, and styling as seen in Template${resumeData.type || 1}.html .
+  3. Maintain the exact spacing, margins, and overall layout of Template${resumeData.type || 1}.html .
+  4. Ensure the HTML is semantically correct and the CSS is clean and efficient.
+  5. Use bullet points for listing skills, job responsibilities, and achievements, matching the style in Template${resumeData.type || 1}.html .
+  6. Highlight key information such as job titles, company names, and dates in the same manner as Template${resumeData.type || 1}.html .
+  7. Ensure that the overall layout is an exact match to Template${resumeData.type || 1}.html, while accurately representing the provided data.
+  8. Make the design responsive to ensure it looks good when converted to PDF, but prioritize matching the layout of Template${resumeData.type || 1}.html .
+  9. Include appropriate margins to ensure the resume is printable, matching those in Template${resumeData.type || 1}.html .
+  
+  Provide only the HTML and CSS code, starting from the <!DOCTYPE html> declaration and ending with the closing </html> tag. Do not include any explanations or additional text outside of the HTML/CSS code.
+  
+  The final result should be an exact replica of Template${resumeData.type || 1}.html in terms of design and layout, filled with the provided data, and ready for PDF conversion.`;
+  
+  console.log("generate pdf prompt", prompt);
     try {
         const assistantId = assistant_id;
         const thread = await openAi.beta.threads.create();
